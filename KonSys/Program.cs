@@ -8,8 +8,8 @@ namespace KonSys
         static void Main(string[] args)
         {
             DirectoryWatcher directoryWatcher = new DirectoryWatcher();
-            
-            directoryWatcher.Writer(@"G:\Важое");
+            Console.WriteLine(Directory.GetParent(Directory.GetCurrentDirectory()));
+            directoryWatcher.Writer(Convert.ToString(Directory.GetParent(Directory.GetCurrentDirectory())));
 
         }
     }

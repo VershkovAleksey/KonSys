@@ -38,9 +38,10 @@ namespace KonSys
             var outFileRtf = Path.Combine(Environment.CurrentDirectory, "Result.txt");
             var outFileHtml = Path.Combine(Environment.CurrentDirectory, "Result.html");
             var outName = new StreamWriter(outFileRtf);
+            Console.WriteLine("Ждите");
             Console.SetOut(outName);
             GetDirectoryList(path);
-            Console.WriteLine("Общий размер проверяемого каталога: {0} Гб", Math.Round(TotalSize / 1024 / 1024 / 1024, 3));
+            Console.WriteLine("\n\nОбщий размер проверяемого каталога: {0} Гб", Math.Round(TotalSize / 1024 / 1024 / 1024, 3));
             outName.Close();
             SautinSoft.RtfToHtml converter = new SautinSoft.RtfToHtml();
 
@@ -65,28 +66,46 @@ namespace KonSys
                     DirectoryInfo[] directoryArray = directory.GetDirectories();
                     FileInfo[] files = directory.GetFiles();
                     double transitionalFileSize = 0;
-                    foreach (FileInfo file in files)
-                    {
-                        transitionalFileSize += file.Length;
-                        string mime = CheckMimeType.GetMimeFromFile(Convert.ToString(file));
-                        Console.WriteLine("Файл: {0} | Размер {1} Мб | Mime-Type: {2}", file.Name, Math.Round((Convert.ToDouble(file.Length)) / 1024 / 1024, 2), mime);
-                    }
+                    
                     int i = 1;
                     foreach (DirectoryInfo directoryInfo in directoryArray)
                     {
-                        Console.WriteLine("\nПорядковый номер каталога:" + i);
-                        Console.WriteLine(directoryInfo.Name);
+                        Console.WriteLine("\n\nВход на {0} каталог от корня {1}",i,dirName );
+                        Console.WriteLine("Каталог: " + directoryInfo.Name);
                         i++;
                         GetSizeOfFile(directoryInfo.FullName);
 
                     }
+                    int j = 0;
+                    for (j = 0; j < files.Length; j++)
+                    {
+                        transitionalFileSize += files[j].Length;
+                        try { 
+                            string mime = CheckMimeType.GetMimeFromFile(Convert.ToString(files[j]));
+                            Console.WriteLine("Файл: {0} | Размер {1} Мб | Mime-Type: {2}", files[j].Name, Math.Round((Convert.ToDouble(files[j].Length)) / 1024 / 1024, 2), mime);
+                            
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Ошибка чтения файла");
+                        }
+                        continue;
+                    }
+                    //foreach (FileInfo file in files)
+                    //{
+                    //    transitionalFileSize += file.Length;
+                    //    string mime = CheckMimeType.GetMimeFromFile(Convert.ToString(file));
+                    //    Console.WriteLine("Файл: {0} | Размер {1} Мб | Mime-Type: {2}", file.Name, Math.Round((Convert.ToDouble(file.Length)) / 1024 / 1024, 2), mime);
+                    //}
                     i = 1;
-                    foreach (DirectoryInfo directoryFile in directoryArray)
+                    
+                    foreach (DirectoryInfo curDirectory in directoryArray)
                     {
                         //рекурсивно вызываем наш метод
-                        GetDirectoryList(directoryFile.FullName);
+                        GetDirectoryList(curDirectory.FullName);
+
                     }
-                   
+
                 }
                 catch (DirectoryNotFoundException ex)
                 {
@@ -101,7 +120,10 @@ namespace KonSys
                 catch (Exception ex)
                 {
                     Console.WriteLine("Произошла ошибка. Обратитесь к администратору. Ошибка: " + ex.Message);
+                    
                 }
+                
+                
                 
             }
         }
@@ -119,11 +141,17 @@ namespace KonSys
                 
                 foreach (FileInfo file in files)
                 {
-                    //Записываем размер файла в байтах
-                    transitionalFileSize += file.Length;
-                    string mime = CheckMimeType.GetMimeFromFile(Convert.ToString(file));
-                    Console.WriteLine("Файл: {0} | Размер {1} Мб | Mime-Type: {2}", file.Name,Math.Round((Convert.ToDouble(file.Length))/1024/1024,2), mime);
-
+                    try { 
+                        //Записываем размер файла в байтах
+                        transitionalFileSize += file.Length;
+                        string mime = CheckMimeType.GetMimeFromFile(Convert.ToString(file));
+                        Console.WriteLine("Файл: {0} | Размер {1} Мб | Mime-Type: {2}", file.Name,Math.Round((Convert.ToDouble(file.Length))/1024/1024,2), mime);
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Ошибка чтения файла");
+                    }
+                    continue;
                 }
                 Console.WriteLine("Размер файлов в каталоге: {0} Гб", Math.Round((transitionalFileSize/1024/1024/1024),3));
                 TotalSize += transitionalFileSize;
@@ -144,6 +172,7 @@ namespace KonSys
             catch (Exception ex)
             {
                 Console.WriteLine("Произошла ошибка. Обратитесь к администратору. Ошибка: " + ex.Message);
+
             }
 
         }
